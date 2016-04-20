@@ -1,14 +1,14 @@
 #pragma once
 
 #include <cinttypes>
-#include <climits>
 #include <string>
+#include "utils.hpp"
 
 template <typename HeadT, typename TailT>
 class _uint {
 public:
   _uint();
-  template <typename other_uint> _uint(other_uint);
+  template <typename other_uint> _uint(const other_uint&);
 
   const _uint& operator=(const _uint&);
   const _uint operator+(const _uint&) const;
@@ -56,52 +56,47 @@ public:
   }
 
   operator uint16_t() const {
-    return ((static_cast<uint16_t>(_head) << (sizeof(TailT) * CHAR_BIT))
+    return ((static_cast<uint16_t>(_head) << bits_size_of<TailT>())
       + static_cast<uint16_t>(_tail));
   }
 
   operator uint32_t() const {
-    return ((static_cast<uint32_t>(_head) << (sizeof(TailT) * CHAR_BIT))
+    return ((static_cast<uint32_t>(_head) << bits_size_of<TailT>())
       + static_cast<uint32_t>(_tail));
   }
 
   operator uint64_t() const {
-    return ((static_cast<uint64_t>(_head) << (sizeof(TailT) * CHAR_BIT))
+    return ((static_cast<uint64_t>(_head) << bits_size_of<TailT>())
       + static_cast<uint64_t>(_tail));
   }
 
-  const HeadT& _get_head() const {
-    return _head;
-  }
-
-  const TailT& _get_tail() const {
-    return _tail;
-  }
-
-protected:
+private:
   HeadT _head;
   TailT _tail;
 };
 
 namespace std {
+
 template <typename HeadT, typename TailT>
 std::string to_string(const _uint<HeadT, TailT>& num) {
   static const _uint<HeadT, TailT> _null(0);
   static const _uint<HeadT, TailT> _ten(10);
-  _uint<HeadT, TailT> _num(num);
   std::string res;
+  _uint<HeadT, TailT> _num(num);
   _uint<HeadT, TailT> base(1);
   while (base * _ten <= _num) {
     base *= _ten;
   }
-  std::cout << "aba" << std::endl;
   while (base != _null) {
-    std::cout << "caba" << std::endl;
     uint8_t div = _num / base;
+    _num %= base;
     base /= _ten;
+    res.push_back('0' + div);
   }
+  res.shrink_to_fit();
   return res;
 }
+
 }
 
 template <typename HeadT, typename TailT>
@@ -112,8 +107,9 @@ _uint<HeadT, TailT>::_uint()
 #pragma GCC diagnostic ignored "-Wshift-count-overflow"
 template <typename HeadT, typename TailT>
 template <typename other_uint>
-_uint<HeadT, TailT>::_uint(other_uint num)
-: _head(num >> (sizeof(TailT) * CHAR_BIT))
+_uint<HeadT, TailT>::_uint(const other_uint& num)
+: _head(bits_size_of<TailT>() < bits_size_of<other_uint>() ?
+    num >> bits_size_of<TailT>() : 0)
 , _tail(num) {}
 
 template <typename HeadT, typename TailT>
@@ -197,27 +193,11 @@ const bool _uint<HeadT, TailT>::operator!=(const _uint& num) const {
 
 template <typename HeadT, typename TailT>
 const bool _uint<HeadT, TailT>::operator<(const _uint& num) const {
-  // if (_head < num._head) {
-  //   return true;
-  // } else if (_head == num._head) {
-  //   if (_tail < num._tail) {
-  //     return true;
-  //   }
-  // }
-  // return false;
   return ((_head < num._head) || (_head == num._head && _tail < num._tail));
 }
 
 template <typename HeadT, typename TailT>
 const bool _uint<HeadT, TailT>::operator>(const _uint& num) const {
-  // if (_head > num._head) {
-  //   return true;
-  // } else if (_head == num._head) {
-  //   if (_tail > num._tail) {
-  //     return true;
-  //   }
-  // }
-  // return false;
   return ((_head > num._head) || (_head == num._head && _tail > num._tail));
 }
 
@@ -233,7 +213,7 @@ const bool _uint<HeadT, TailT>::operator>=(const _uint& num) const {
 
 template <typename HeadT, typename TailT>
 const bool _uint<HeadT, TailT>::operator!() const {
-  return !((bool)*this);
+  return !(bool(*this));
 }
 
 template <typename HeadT, typename TailT>
@@ -383,7 +363,7 @@ template <typename move_uint>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(move_uint num) {
   uint8_t _num = num;
   _head <<= _num;
-  _head ^= HeadT(_tail >> (sizeof(TailT) * CHAR_BIT - _num));
+  _head ^= HeadT(_tail >> (bits_size_of<TailT>() - _num));
   _tail <<= _num;
   return *this;
 }
@@ -393,7 +373,7 @@ template <typename move_uint>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(move_uint num) {
   uint8_t _num = num;
   _tail >>= _num;
-  _tail ^= HeadT(_head << (sizeof(TailT) * CHAR_BIT - _num));
+  _tail ^= HeadT(_head << (bits_size_of<TailT>() - _num));
   _head >>= _num;
   return *this;
 }

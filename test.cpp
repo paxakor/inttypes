@@ -5,31 +5,34 @@
 
 size_t errors = 0;
 
-void check(uint32_t u, uint32_t v) {
-  uint56_t a(u);
-  uint56_t b(v);
+void check(const uint32_t u, const uint32_t v) {
+  const uint96_t a(u);
+  const uint96_t b(v);
   // std::cout << u << " == " << std::to_string(a) << std::endl;
-  if (std::to_string(u + v) != std::to_string(a + b)) {
+  if (uint32_t(u + v) != uint32_t(a + b)) {
+    // std::cout << uint64_t(u + v) << " != " << uint64_t(a + b) << std::endl;
     ++errors;
   }
-  if (std::to_string(u - v) != std::to_string(a - b)) {
-    ++errors;
-  }
-  // if (std::to_string(u * v) != std::to_string(a * b)) {
+  // if (uint32_t(u - v) != uint32_t(a - b)) {
   //   ++errors;
   // }
-  // if (std::to_string(u / v) != std::to_string(a / b)) {
+  if (uint32_t(u * v) != uint32_t(a * b)) {
+    ++errors;
+  }
+  // if (uint32_t(u / v) != uint32_t(a / b)) {
   //   ++errors;
-    // std::cout << (a / b).to_string() << std::endl;
   // }
 }
 
+inline uint32_t f(uint32_t n) {
+  return 103 * n * n * n + 51 * n * n + 25 * n + 12;
+}
+
 int main() {
-  size_t s = time(nullptr);
-  for (size_t i = 0; i < 1e4; ++i) {
-    srand(s++);
-    uint32_t u = rand();
-    uint32_t v = rand();
+  size_t s = f(time(nullptr));
+  for (size_t i = 0; i < 1e3; ++i) {
+    uint32_t u = f(s++);
+    uint32_t v = f(s++);
     check(u, v);
   }
   std::cout << errors << std::endl;
