@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <algorithm>
 #include <string>
 #include "utils.hpp"
 
@@ -78,21 +79,33 @@ private:
 namespace std {
 
 template <typename HeadT, typename TailT>
-std::string to_string(const _uint<HeadT, TailT>& num) {
+std::string to_string(const _uint<HeadT, TailT>& num, const uint8_t base = 10) {
   static const _uint<HeadT, TailT> _null(0);
-  static const _uint<HeadT, TailT> _ten(10);
+  static const _uint<HeadT, TailT> _one(1);
+  // static const _uint<HeadT, TailT> _ten(10);
   std::string res;
   _uint<HeadT, TailT> _num(num);
-  _uint<HeadT, TailT> base(1);
-  while (base * _ten <= _num) {
-    base *= _ten;
+  // _uint<HeadT, TailT> base(1);
+  // while (base * _ten <= _num) {
+  //   base *= _ten;
+  // }
+  // while (base != _null) {
+  //   uint8_t div = _num / base;
+  //   _num %= base;
+  //   base /= _ten;
+  //   res.push_back('0' + div);
+  // }
+  while(_num != _null) {
+    if (_num & _one)
+      res.push_back('1');
+    else
+      res.push_back('0');
+    _num >>= 1;
   }
-  while (base != _null) {
-    uint8_t div = _num / base;
-    _num %= base;
-    base /= _ten;
-    res.push_back('0' + div);
+  if (res.empty()) {
+    res.push_back('0');
   }
+  std::reverse(res.begin(), res.end());
   res.shrink_to_fit();
   return res;
 }
