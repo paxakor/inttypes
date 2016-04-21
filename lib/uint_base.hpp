@@ -2,50 +2,29 @@
 
 #include <cinttypes>
 #include <cstddef>
-#include <algorithm>
-#include <string>
+#include "uint.hpp"
 #include "utils.hpp"
 
 template <typename HeadT, typename TailT>
 class _uint {
 public:
   _uint();
+  _uint(const HeadT&, const TailT&);
   template <typename other_uint> _uint(const other_uint&);
 
-  const _uint& operator=(const _uint&);
-  const _uint operator+(const _uint&) const;
-  const _uint operator-(const _uint&) const;
-  const _uint operator*(const _uint&) const;
-  const _uint operator/(const _uint&) const;
-  const _uint operator%(const _uint&) const;
-  const _uint& operator++();
   const _uint operator++(int);
-  const _uint& operator--();
   const _uint operator--(int);
-  const bool operator==(const _uint&) const;
-  const bool operator!=(const _uint&) const;
-  const bool operator<(const _uint&) const;
-  const bool operator>(const _uint&) const;
-  const bool operator<=(const _uint&) const;
-  const bool operator>=(const _uint&) const;
-  const bool operator!() const;
-  const bool operator&&(const _uint&) const;
-  const bool operator||(const _uint&) const;
-  const _uint operator~() const;
-  const _uint operator&(const _uint&) const;
-  const _uint operator|(const _uint&) const;
-  const _uint operator^(const _uint&) const;
+  const _uint& operator++();
+  const _uint& operator--();
+  const _uint& operator=(const _uint&);
   const _uint& operator+=(const _uint&);
   const _uint& operator-=(const _uint&);
   const _uint& operator*=(const _uint&);
   const _uint& operator/=(const _uint&);
   const _uint& operator%=(const _uint&);
   const _uint& operator&=(const _uint&);
-  const _uint& operator|=(const _uint&);
   const _uint& operator^=(const _uint&);
-
-  template <typename move_uint> const _uint operator<<(const move_uint&) const;
-  template <typename move_uint> const _uint operator>>(const move_uint&) const;
+  const _uint& operator|=(const _uint&);
   template <typename move_uint> const _uint& operator<<=(const move_uint&);
   template <typename move_uint> const _uint& operator>>=(const move_uint&);
 
@@ -72,51 +51,28 @@ public:
       + static_cast<uint64_t>(_tail));
   }
 
+  const HeadT& head() const {
+    return _head;
+  }
+
+  const TailT& tail() const {
+    return _tail;
+  }
+
 private:
   HeadT _head;
   TailT _tail;
 };
 
-namespace std {
-
-template <typename HeadT, typename TailT>
-std::string to_string(const _uint<HeadT, TailT>& num, const uint8_t base = 10) {
-  static const _uint<HeadT, TailT> _null(0);
-  static const _uint<HeadT, TailT> _one(1);
-  // static const _uint<HeadT, TailT> _ten(10);
-  std::string res;
-  _uint<HeadT, TailT> _num(num);
-  // _uint<HeadT, TailT> base(1);
-  // while (base * _ten <= _num) {
-  //   base *= _ten;
-  // }
-  // while (base != _null) {
-  //   uint8_t div = _num / base;
-  //   _num %= base;
-  //   base /= _ten;
-  //   res.push_back('0' + div);
-  // }
-  while(_num != _null) {
-    if (_num & _one)
-      res.push_back('1');
-    else
-      res.push_back('0');
-    _num >>= 1;
-  }
-  if (res.empty()) {
-    res.push_back('0');
-  }
-  std::reverse(res.begin(), res.end());
-  res.shrink_to_fit();
-  return res;
-}
-
-}
-
 template <typename HeadT, typename TailT>
 _uint<HeadT, TailT>::_uint()
 : _head(0)
 , _tail(0) {}
+
+template <typename HeadT, typename TailT>
+_uint<HeadT, TailT>::_uint(const HeadT& h, const TailT& t)
+: _head(h)
+, _tail(t) {}
 
 #pragma GCC diagnostic ignored "-Wshift-count-overflow"
 template <typename HeadT, typename TailT>
@@ -131,36 +87,6 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator=(const _uint& num) {
   _head = num._head;
   _tail = num._tail;
   return *this;
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator+(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res += num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator-(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res -= num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator*(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res *= num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator/(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res /= num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator%(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res %= num);
 }
 
 template <typename HeadT, typename TailT>
@@ -193,91 +119,6 @@ const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator--(int) {
   const _uint<HeadT, TailT> res(*this);
   --(*this);
   return res;
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator==(const _uint& num) const {
-  return (_head == num._head && _tail == num._tail);
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator!=(const _uint& num) const {
-  return !(*this == num);
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator<(const _uint& num) const {
-  return ((_head < num._head) || (_head == num._head && _tail < num._tail));
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator>(const _uint& num) const {
-  return ((_head > num._head) || (_head == num._head && _tail > num._tail));
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator<=(const _uint& num) const {
-  return !(*this > num);
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator>=(const _uint& num) const {
-  return !(*this < num);
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator!() const {
-  return !(bool(*this));
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator&&(const _uint& num) const {
-  return (!!(*this) && !!(num));
-}
-
-template <typename HeadT, typename TailT>
-const bool _uint<HeadT, TailT>::operator||(const _uint& num) const {
-  return (!!(*this) || !!(num));
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator~() const {
-  _uint<HeadT, TailT> res(*this);
-  res._head = ~res._head;
-  res._tail = ~res._tail;
-  return res;
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator&(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res &= num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator|(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res |= num);
-}
-
-template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator^(const _uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res ^= num);
-}
-
-template <typename HeadT, typename TailT>
-template <typename move_uint>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator<<(const move_uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res <<= num);
-}
-
-template <typename HeadT, typename TailT>
-template <typename move_uint>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator>>(const move_uint& num) const {
-  _uint<HeadT, TailT> res(*this);
-  return (res >>= num);
 }
 
 template <typename HeadT, typename TailT>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "inttypes_base.hpp"
+#include "uint.hpp"
 
 typedef _uint<uint8_t,  uint16_t> uint24_t;
 typedef _uint<uint8_t,  uint32_t> uint40_t;

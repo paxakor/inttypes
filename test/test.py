@@ -18,20 +18,18 @@ for i in range(n):
   proc = Popen(["./test", str(a), str(b)], stdout = PIPE, stderr = PIPE)
   proc.wait()
   out, err = proc.communicate()
-  # if len(err) != 0:
-  #   continue
   out = out.split()
-  if int(out[0], 2) != a + b:
-    print(a, '+', b, '!=', int(out[0], 2))
+  if int(out[0]) != a + b:
+    print(a, '+', b, '!=', int(out[0]))
     errors += 1
-  if int(out[1], 2) != a - b and int(out[1], 2) != 2**l + (a - b):
-    print(a, '-', b, '!=', int(out[1], 2))
+  if int(out[1]) != a - b and int(out[1]) != 2**l + (a - b):
+    print(a, '-', b, '!=', int(out[1]))
     errors += 1
-  if int(out[2], 2) != a * b:
-    print(a, '*', b, '!=', int(out[2], 2))
+  if int(out[2]) != a * b:
+    print(a, '*', b, '!=', int(out[2]))
     errors += 1
-  if int(out[3], 2) != a // b:
-    print(a, '/', b, '!=', int(out[3], 2))
+  if int(out[3]) != a // b:
+    print(a, '/', b, '!=', int(out[3]))
     errors += 1
 
 print(errors)
