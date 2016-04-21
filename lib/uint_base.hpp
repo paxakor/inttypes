@@ -222,8 +222,8 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator^=(const _uint& num) {
 }
 
 template <typename HeadT, typename TailT>
-template <typename move_uint>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(const move_uint& num) {
+template <typename mvT>
+const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(const mvT& num) {
   const std::size_t _num = num;
   _head <<= _num;
   _head ^= HeadT(_tail >> (bits_size_of<TailT>() - _num));
@@ -232,8 +232,8 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(const move_uint& num
 }
 
 template <typename HeadT, typename TailT>
-template <typename move_uint>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(const move_uint& num) {
+template <typename mvT>
+const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(const mvT& num) {
   const std::size_t _num = num;
   _tail >>= _num;
   _tail ^= TailT(_head) << (bits_size_of<TailT>() - _num);

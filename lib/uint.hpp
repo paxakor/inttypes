@@ -30,114 +30,134 @@ std::string to_string(const _uint<HeadT, TailT>& num, const uint8_t base = 10) {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator+(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res += second);
+const _uint<HeadT, TailT> operator+(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res += rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator-(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res -= second);
+const _uint<HeadT, TailT> operator-(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res -= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator*(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res *= second);
+const _uint<HeadT, TailT> operator*(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res *= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator/(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res /= second);
+const _uint<HeadT, TailT> operator/(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res /= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator%(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res %= second);
+const _uint<HeadT, TailT> operator%(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res %= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const bool operator==(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return (first.head() == second.head() && first.tail() == second.tail());
+const bool operator==(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return (lhs.head() == rhs.head() && lhs.tail() == rhs.tail());
 }
 
 template <typename HeadT, typename TailT>
-const bool operator!=(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return !(first == second);
+const bool operator!=(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return !(lhs == rhs);
 }
 
 template <typename HeadT, typename TailT>
-const bool operator<(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return ((first.head() < second.head()) || (first.head() == second.head() && first.tail() < second.tail()));
+const bool operator<(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return ((lhs.head() < rhs.head()) ||
+    (lhs.head() == rhs.head() && lhs.tail() < rhs.tail()));
 }
 
 template <typename HeadT, typename TailT>
-const bool operator>(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return ((first.head() > second.head()) || (first.head() == second.head() && first.tail() > second.tail()));
+const bool operator>(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return ((lhs.head() > rhs.head()) ||
+    (lhs.head() == rhs.head() && lhs.tail() > rhs.tail()));
 }
 
 template <typename HeadT, typename TailT>
-const bool operator<=(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return !(first > second);
+const bool operator<=(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return !(lhs > rhs);
 }
 
 template <typename HeadT, typename TailT>
-const bool operator>=(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return !(first < second);
+const bool operator>=(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return !(lhs < rhs);
 }
 
 template <typename HeadT, typename TailT>
-const bool operator!(const _uint<HeadT, TailT>& first) {
-  return !(bool(first));
+const bool operator!(const _uint<HeadT, TailT>& lhs) {
+  return !(bool(lhs));
 }
 
 template <typename HeadT, typename TailT>
-const bool operator&&(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return (!!first && !!second);
+const bool operator&&(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return (!!lhs && !!rhs);
 }
 
 template <typename HeadT, typename TailT>
-const bool operator||(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  return (!!first || !!second);
+const bool operator||(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  return (!!lhs || !!rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator~(const _uint<HeadT, TailT>& first) {
-  const auto h = ~first.head();
-  const auto t = ~first.tail();
+const _uint<HeadT, TailT> operator~(const _uint<HeadT, TailT>& lhs) {
+  const auto h = ~lhs.head();
+  const auto t = ~lhs.tail();
   const _uint<HeadT, TailT> res(h, t);
   return res;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator&(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res &= second);
+const _uint<HeadT, TailT> operator&(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res &= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator|(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res |= second);
+const _uint<HeadT, TailT> operator|(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res |= rhs);
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> operator^(const _uint<HeadT, TailT>& first, const _uint<HeadT, TailT>& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res ^= second);
+const _uint<HeadT, TailT> operator^(const _uint<HeadT, TailT>& lhs,
+  const _uint<HeadT, TailT>& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res ^= rhs);
 }
 
-template <typename HeadT, typename TailT, typename move_uint>
-const _uint<HeadT, TailT> operator<<(const _uint<HeadT, TailT>& first, const move_uint& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res <<= second);
+template <typename HeadT, typename TailT, typename mvT>
+const _uint<HeadT, TailT> operator<<(const _uint<HeadT, TailT>& lhs,
+  const mvT& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res <<= rhs);
 }
 
-template <typename HeadT, typename TailT, typename move_uint>
-const _uint<HeadT, TailT> operator>>(const _uint<HeadT, TailT>& first, const move_uint& second) {
-  _uint<HeadT, TailT> res(first);
-  return (res >>= second);
+template <typename HeadT, typename TailT, typename mvT>
+const _uint<HeadT, TailT> operator>>(const _uint<HeadT, TailT>& lhs,
+  const mvT& rhs) {
+  _uint<HeadT, TailT> res(lhs);
+  return (res >>= rhs);
 }
