@@ -9,8 +9,8 @@ int main(int argc, char const *argv[]) {
   } else {
     std::cin >> u >> v;
   }
-  const uint24_t a(u);
-  const uint24_t b(v);
+  const uint48_t a(u);
+  const uint48_t b(v);
   std::cout << std::to_string(a + b, 2) << std::endl
             << std::to_string(a - b, 2) << std::endl
             << std::to_string(a * b, 2) << std::endl
