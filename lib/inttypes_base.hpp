@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <cstddef>
 #include <algorithm>
 #include <string>
 #include "utils.hpp"
@@ -242,8 +243,8 @@ const bool _uint<HeadT, TailT>::operator||(const _uint& num) const {
 template <typename HeadT, typename TailT>
 const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator~() const {
   _uint<HeadT, TailT> res(*this);
-  ~res._head;
-  ~res._tail;
+  res._head = ~res._head;
+  res._tail = ~res._tail;
   return res;
 }
 
@@ -292,12 +293,17 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator+=(const _uint& num) {
 
 template <typename HeadT, typename TailT>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator-=(const _uint& num) {
-  const TailT tail_dif = _tail - num._tail;
-  if (tail_dif > _tail) {  // overflow
-    --_head;
+  if (*this >= num) {
+    const TailT tail_dif = _tail - num._tail;
+    if (tail_dif > _tail) {  // overflow
+      --_head;
+    }
+    _head -= num._head;
+    _tail = tail_dif;
+  } else {
+    *this = ~(num - *this);
+    ++(*this);
   }
-  _head -= num._head;
-  _tail = tail_dif;
   return *this;
 }
 
@@ -374,7 +380,7 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator^=(const _uint& num) {
 template <typename HeadT, typename TailT>
 template <typename move_uint>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(move_uint num) {
-  uint8_t _num = num;
+  std::size_t _num = num;
   _head <<= _num;
   _head ^= HeadT(_tail >> (bits_size_of<TailT>() - _num));
   _tail <<= _num;
@@ -384,9 +390,9 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(move_uint num) {
 template <typename HeadT, typename TailT>
 template <typename move_uint>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(move_uint num) {
-  uint8_t _num = num;
+  std::size_t _num = num;
   _tail >>= _num;
-  _tail ^= HeadT(_head << (bits_size_of<TailT>() - _num));
+  _tail ^= TailT(_head) << (bits_size_of<TailT>() - _num);
   _head >>= _num;
   return *this;
 }
