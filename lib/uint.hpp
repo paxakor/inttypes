@@ -7,34 +7,6 @@
 #include "uint_base.hpp"
 #include "utils.hpp"
 
-// template <typename HeadT, typename TailT>
-// operator bool(const _uint<HeadT, TailT>& num) {
-//   return (num.head() || num.tail());
-// }
-
-// template <typename HeadT, typename TailT>
-// operator uint8_t(const _uint<HeadT, TailT>& num) {
-//   return static_cast<uint8_t>(num.tail());
-// }
-
-// template <typename HeadT, typename TailT>
-// operator uint16_t(const _uint<HeadT, TailT>& num) {
-//   return ((static_cast<uint16_t>(num.head()) << bits_size_of<TailT>())
-//     + static_cast<uint16_t>(num.tail()));
-// }
-
-// template <typename HeadT, typename TailT>
-// operator uint32_t(const _uint<HeadT, TailT>& num) {
-//   return ((static_cast<uint32_t>(num.head()) << bits_size_of<TailT>())
-//     + static_cast<uint32_t>(num.tail()));
-// }
-
-// template <typename HeadT, typename TailT>
-// operator uint64_t(const _uint<HeadT, TailT>& num) {
-//   return ((static_cast<uint64_t>(num.head()) << bits_size_of<TailT>())
-//     + static_cast<uint64_t>(num.tail()));
-// }
-
 namespace std {
 template <typename HeadT, typename TailT>
 std::string to_string(const _uint<HeadT, TailT>& num, const uint8_t base = 10) {
