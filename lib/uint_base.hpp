@@ -2,8 +2,12 @@
 
 #include <cinttypes>
 #include <cstddef>
+#include <stdexcept>
+#include <string>
 #include "uint.hpp"
 #include "utils.hpp"
+
+namespace pkr {
 
 template <typename HeadT, typename TailT>
 class _uint {
@@ -11,6 +15,7 @@ public:
   _uint();
   _uint(const HeadT&, const TailT&);
   template <typename other_uint> _uint(const other_uint&);
+  _uint(const std::string&, const uint8_t = 10);
 
   const _uint operator++(int);
   const _uint operator--(int);
@@ -65,6 +70,16 @@ private:
 };
 
 template <typename HeadT, typename TailT>
+constexpr _uint<HeadT, TailT> uint_zero() {
+  return _uint<HeadT, TailT>(0);
+}
+
+template <typename HeadT, typename TailT>
+constexpr _uint<HeadT, TailT> uint_one() {
+  return _uint<HeadT, TailT>(1);
+}
+
+template <typename HeadT, typename TailT>
 _uint<HeadT, TailT>::_uint()
 : _head(0)
 , _tail(0) {}
@@ -81,6 +96,17 @@ _uint<HeadT, TailT>::_uint(const other_uint& num)
 : _head(bits_size_of<TailT>() < bits_size_of<other_uint>() ?
     num >> bits_size_of<TailT>() : 0)
 , _tail(num) {}
+
+template <typename HeadT, typename TailT>
+_uint<HeadT, TailT>::_uint(const std::string& str, const uint8_t base)
+: _head(0)
+, _tail(0) {
+  _uint<HeadT, TailT> digit_bit(1);
+  for (auto iter = str.rbegin(); iter != str.rend(); ++iter) {
+    *this += (digit_bit * _uint<HeadT, TailT>(*iter - '0'));
+    digit_bit *= base;
+  }
+}
 
 template <typename HeadT, typename TailT>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator=(const _uint& num) {
@@ -150,15 +176,13 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator-=(const _uint& num) {
 
 template <typename HeadT, typename TailT>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator*=(const _uint& num) {
-  static const _uint<HeadT, TailT> _null(0);
-  static const _uint<HeadT, TailT> _one(1);
   _uint<HeadT, TailT> mul(num < *this ? num : *this);
   _uint<HeadT, TailT> val(num > *this ? num : *this);
   // _uint<HeadT, TailT> mul(num);
   // _uint<HeadT, TailT> val(*this);
-  _uint<HeadT, TailT> res(_null);
-  while (mul != _null) {
-    if (!!(mul & _one)) {
+  _uint<HeadT, TailT> res(uint_zero<HeadT, TailT>());
+  while (mul != uint_zero<HeadT, TailT>()) {
+    if (!!(mul & uint_one<HeadT, TailT>())) {
       res += val;
     }
     mul >>= 1;
@@ -170,25 +194,23 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator*=(const _uint& num) {
 
 template <typename HeadT, typename TailT>
 const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator/=(const _uint& num) {
-  static const _uint<HeadT, TailT> _one(1);
-  const std::size_t sz = bits_size_of(*this) - bits_len(num);
-  std::size_t moved = 0;
-  _uint<HeadT, TailT> digit_bit(_one);
-  _uint<HeadT, TailT> base(digit_bit * num);
+  if (num == uint_zero<HeadT, TailT>()) {
+    throw std::runtime_error::runtime_error("division by zero");
+  }
+  _uint<HeadT, TailT> base(num);
+  _uint<HeadT, TailT> digit_bit(1);
   _uint<HeadT, TailT> res(0);
-  while (base <= *this && moved < sz) {
+  while (bits_len(*this) > bits_len(base)) {
     digit_bit <<= 1;
     base <<= 1;
-    ++moved;
   }
-  while (moved != 0) {
-    --moved;
-    digit_bit >>= 1;
-    base >>= 1;
+  while (*this >= num) {
     if (base <= *this) {
       *this -= base;
       res += digit_bit;
     }
+    digit_bit >>= 1;
+    base >>= 1;
   }
   *this = res;
   return *this;
@@ -240,3 +262,5 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(const mvT& num) {
   _head >>= _num;
   return *this;
 }
+
+}  // namespace pkr

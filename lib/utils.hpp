@@ -4,12 +4,12 @@
 #include <cstddef>
 
 template <typename Type>
-inline std::size_t bits_size_of() {
+constexpr std::size_t bits_size_of() {
   return sizeof(Type) * CHAR_BIT;
 }
 
 template <typename Type>
-inline std::size_t bits_size_of(const Type& num) {
+constexpr std::size_t bits_size_of(const Type& num) {
   return bits_size_of<Type>();
 }
 

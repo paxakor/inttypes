@@ -3,8 +3,8 @@ from subprocess import Popen, PIPE
 from sys import argv
 
 n = 1000
-s = 24
-l = 48
+s = 80
+l = 80
 
 if "-n" in argv:
   n = int(argv[argv.index("-n") + 1])
@@ -19,17 +19,17 @@ for i in range(n):
   proc.wait()
   out, err = proc.communicate()
   out = out.split()
-  if int(out[0]) != a + b:
+  if int(out[0]) != (a + b) % 2**l:
     print(a, '+', b, '!=', int(out[0]))
     errors += 1
-  if int(out[1]) != a - b and int(out[1]) != 2**l + (a - b):
+  if int(out[1]) != (a - b) % 2**l:
     print(a, '-', b, '!=', int(out[1]))
     errors += 1
-  if int(out[2]) != a * b:
+  if int(out[2]) != (a * b) % 2**l:
     print(a, '*', b, '!=', int(out[2]))
     errors += 1
-  if int(out[3]) != a // b:
+  if int(out[3]) != (a // b) % 2**l:
     print(a, '/', b, '!=', int(out[3]))
     errors += 1
 
-print(errors)
+print(errors, "errors occured")
