@@ -12,13 +12,14 @@ if "-s" in argv:
   s = int(argv[argv.index("-s") + 1])
 
 errors = 0
+proc = Popen(["./test"], stdin = PIPE, stdout = PIPE)
+proc.stdin.write(bytes(str(n) + '\n', "ascii"))
 for i in range(n):
   a = randint(0, 2**s - 1)
   b = randint(1, 2**s - 1)
-  proc = Popen(["./test", str(a), str(b)], stdout = PIPE, stderr = PIPE)
-  proc.wait()
-  out, err = proc.communicate()
-  out = out.split()
+  proc.stdin.write(bytes(str(a) + ' ' + str(b) + '\n', "ascii"))
+  proc.stdin.flush()
+  out = proc.stdout.readline().split()
   if int(out[0]) != (a + b) % 2**l:
     print(a, '+', b, '!=', int(out[0]))
     errors += 1
