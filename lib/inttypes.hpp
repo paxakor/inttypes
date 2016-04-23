@@ -13,7 +13,9 @@ typedef _uint<uint16_t, uint64_t> uint80_t;
 typedef _uint<uint8_t,  uint80_t> uint88_t;
 typedef _uint<uint32_t, uint64_t> uint96_t;
 typedef _uint<uint40_t, uint64_t> uint104_t;
-typedef _uint<uint48_t, uint64_t> uint112_t;
-typedef _uint<uint56_t, uint64_t> uint120_t;
+typedef _uint<uint64_t, uint64_t> uint128_t;
+typedef _uint<uint128_t, uint128_t> uint256_t;
+typedef _uint<uint256_t, uint256_t> uint512_t;
+typedef _uint<uint512_t, uint512_t> uint1024_t;
 
 }  // namespace pkr
