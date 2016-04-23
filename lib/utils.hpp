@@ -4,20 +4,20 @@
 #include <cstddef>
 
 template <typename Type>
-constexpr std::size_t bits_size_of() {
+constexpr ssize_t bits_size_of() {
   return sizeof(Type) * CHAR_BIT;
 }
 
 template <typename Type>
-constexpr std::size_t bits_size_of(const Type& num) {
+constexpr ssize_t bits_size_of(const Type& num) {
   return bits_size_of<Type>();
 }
 
 template <typename Type>
-std::size_t bits_len(const Type& num) {
-  std::size_t len = 0;
-  auto tmp(num);
-  while (tmp != Type(0)) {
+ssize_t bits_len(const Type& num) {
+  ssize_t len = 0;
+  auto tmp = num;
+  while (tmp) {
     ++len;
     tmp >>= 1;
   }

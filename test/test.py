@@ -3,8 +3,8 @@ from subprocess import Popen, PIPE
 from sys import argv
 
 n = 1000
-s = 80
-l = 80
+s = 8
+l = 56
 
 if "-n" in argv:
   n = int(argv[argv.index("-n") + 1])
@@ -17,6 +17,7 @@ proc.stdin.write(bytes(str(n) + '\n', "ascii"))
 for i in range(n):
   a = randint(0, 2**s - 1)
   b = randint(1, 2**s - 1)
+  # a, b = max(a, b), min(a, b)
   proc.stdin.write(bytes(str(a) + ' ' + str(b) + '\n', "ascii"))
   proc.stdin.flush()
   out = proc.stdout.readline().split()
