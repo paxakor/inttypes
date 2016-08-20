@@ -11,29 +11,29 @@
 namespace pkr {
 
 template <typename HeadT, typename TailT>
-class _uint {
+class Uint {
 public:
-  _uint();
-  _uint(const HeadT&, const TailT&);
-  template <typename other_uint> _uint(const other_uint&);
-  _uint(const std::string&, const uint8_t = 10);
+  Uint();
+  Uint(const HeadT&, const TailT&);
+  template <typename otherUint> Uint(const otherUint&);
+  Uint(const std::string&, const uint8_t = 10);
 
-  const _uint operator++(int);
-  const _uint operator--(int);
-  const _uint& operator++();
-  const _uint& operator--();
-  const _uint& operator=(const _uint&);
-  const _uint& operator+=(const _uint&);
-  const _uint& operator-=(const _uint&);
-  const _uint& operator*=(const _uint&);
-  const _uint& operator/=(const _uint&);
-  const _uint& operator%=(const _uint&);
-  const _uint& operator&=(const _uint&);
-  const _uint& operator^=(const _uint&);
-  const _uint& operator|=(const _uint&);
-  const _uint operator~() const;
-  template <typename mvT> const _uint& operator<<=(const mvT&);
-  template <typename mvT> const _uint& operator>>=(const mvT&);
+  const Uint operator~() const;
+  const Uint operator++(int);
+  const Uint operator--(int);
+  const Uint& operator++();
+  const Uint& operator--();
+  const Uint& operator=(const Uint&);
+  const Uint& operator+=(const Uint&);
+  const Uint& operator-=(const Uint&);
+  const Uint& operator*=(const Uint&);
+  const Uint& operator/=(const Uint&);
+  const Uint& operator%=(const Uint&);
+  const Uint& operator&=(const Uint&);
+  const Uint& operator^=(const Uint&);
+  const Uint& operator|=(const Uint&);
+  const Uint& operator<<=(ssize_t);
+  const Uint& operator>>=(ssize_t);
 
   operator bool() const {
     return (_head || _tail);
@@ -72,42 +72,42 @@ private:
 };
 
 template <typename HeadT, typename TailT>
-_uint<HeadT, TailT>::_uint()
+Uint<HeadT, TailT>::Uint()
   : _head(0)
   , _tail(0) {}
 
 template <typename HeadT, typename TailT>
-_uint<HeadT, TailT>::_uint(const HeadT& h, const TailT& t)
+Uint<HeadT, TailT>::Uint(const HeadT& h, const TailT& t)
   : _head(h)
   , _tail(t) {}
 
 template <typename HeadT, typename TailT>
-template <typename other_uint>
-_uint<HeadT, TailT>::_uint(const other_uint& num)
-  : _head(bits_size_of<TailT>() < bits_size_of<other_uint>() ?
+template <typename otherUint>
+Uint<HeadT, TailT>::Uint(const otherUint& num)
+  : _head(bits_size_of<TailT>() < bits_size_of<otherUint>() ?
       num >> bits_size_of<TailT>() : 0)
   , _tail(num) {}
 
 template <typename HeadT, typename TailT>
-_uint<HeadT, TailT>::_uint(const std::string& str, const uint8_t base)
+Uint<HeadT, TailT>::Uint(const std::string& str, const uint8_t base)
   : _head(0)
   , _tail(0) {
-  _uint<HeadT, TailT> digit(1);
+  Uint<HeadT, TailT> digit(1);
   for (auto iter = str.rbegin(); iter != str.rend(); ++iter) {
-    *this += (digit * _uint<HeadT, TailT>(*iter - '0'));
+    *this += (digit * Uint<HeadT, TailT>(*iter - '0'));
     digit *= base;
   }
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator=(const Uint& num) {
   _head = num._head;
   _tail = num._tail;
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator++() {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator++() {
   const auto tmp = _tail;
   ++_tail;
   if (_tail < tmp) {
@@ -117,14 +117,14 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator++() {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator++(int) {
-  const _uint<HeadT, TailT> res(*this);
+const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator++(int) {
+  const Uint<HeadT, TailT> res(*this);
   ++(*this);
   return res;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator--() {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() {
   const auto tmp = _tail;
   --_tail;
   if (_tail > tmp) {
@@ -134,14 +134,14 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator--() {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator--(int) {
-  const _uint<HeadT, TailT> res(*this);
+const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator--(int) {
+  const Uint<HeadT, TailT> res(*this);
   --(*this);
   return res;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator+=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator+=(const Uint& num) {
   const TailT tail_sum = _tail + num._tail;
   if (tail_sum < _tail) {
     ++_head;
@@ -152,7 +152,7 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator+=(const _uint& num) {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator-=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator-=(const Uint& num) {
   if (*this >= num) {
     if (_tail < num._tail) {
       --_head;
@@ -167,9 +167,9 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator-=(const _uint& num) {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator*=(const _uint& num) {
-  _uint<HeadT, TailT> base(num);
-  _uint<HeadT, TailT> tmp(*this);
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator*=(const Uint& num) {
+  Uint<HeadT, TailT> base(num);
+  Uint<HeadT, TailT> tmp(*this);
   *this = 0;
   while (tmp) {
     if (static_cast<uint8_t>(tmp) & 1) {
@@ -182,83 +182,89 @@ const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator*=(const _uint& num) {
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator/=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
   if (num == 0) {
     throw std::runtime_error::runtime_error("division by zero");
   }
-  _uint<HeadT, TailT> base(num);
-  _uint<HeadT, TailT> digit_bit(1);
-  _uint<HeadT, TailT> tmp(*this);
+  Uint<HeadT, TailT> base(num);
+  Uint<HeadT, TailT> digit_bit(1);
+  Uint<HeadT, TailT> tmp(base);
+  tmp <<= 1;
+  while (tmp > base) {
+    digit_bit <<= 1;
+    base <<= 1;
+    tmp <<= 1;
+  }
+  tmp = *this;
   *this = 0;
-  if (tmp >= base) {
-    ssize_t k = bits_size_of(*this) - bits_len(base);
-    digit_bit <<= k;
-    base <<= k;
-    while (tmp >= num) {
-      // std::cout << "000" << std::endl;
-      if (base <= tmp) {
-        tmp -= base;
-        *this ^= digit_bit;
-      }
-      digit_bit >>= 1;
-      base >>= 1;
+  while (num <= tmp) {
+    if (base <= tmp) {
+      tmp -= base;
+      *this += digit_bit;
     }
+    digit_bit >>= 1;
+    base >>= 1;
   }
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator%=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator%=(const Uint& num) {
   return (*this -= ((*this / num) * num));
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator&=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator&=(const Uint& num) {
   _head &= num._head;
   _tail &= num._tail;
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator|=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator|=(const Uint& num) {
   _head |= num._head;
   _tail |= num._tail;
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator^=(const _uint& num) {
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator^=(const Uint& num) {
   _head ^= num._head;
   _tail ^= num._tail;
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-const _uint<HeadT, TailT> _uint<HeadT, TailT>::operator~() const {
-  _uint<HeadT, TailT> res(*this);
+const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator~() const {
+  Uint<HeadT, TailT> res(*this);
   res._head = ~(res._head);
   res._tail = ~(res._tail);
   return res;
 }
 
 template <typename HeadT, typename TailT>
-template <typename mvT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator<<=(const mvT& num) {
-  const std::size_t _num = num;
-  _head <<= _num;
-  _head ^= HeadT(_tail >> (bits_size_of<TailT>() - _num));
-  _tail <<= _num;
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator<<=(ssize_t num) {
+  if (num <= 8) {
+    _head <<= num;
+    _head ^= HeadT(_tail >> (bits_size_of<TailT>() - num));
+    _tail <<= num;
+  } else {
+    *this <<= 8;
+    *this <<= (num - 8);
+  }
   return *this;
 }
 
 template <typename HeadT, typename TailT>
-template <typename mvT>
-const _uint<HeadT, TailT>& _uint<HeadT, TailT>::operator>>=(const mvT& num) {
-  const std::size_t _num = num;
-  const auto tmp = *this;
-  _tail >>= _num;
-  _tail ^= (TailT(_head) << (bits_size_of<TailT>() - _num));
-  _head >>= _num;
+const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator>>=(ssize_t num) {
+  if (num <= 8) {
+    _tail >>= num;
+    _tail ^= (TailT(_head) << (bits_size_of<TailT>() - num));
+    _head >>= num;
+  } else {
+    *this >>= 8;
+    *this >>= (num - 8);
+  }
   return *this;
 }
 
