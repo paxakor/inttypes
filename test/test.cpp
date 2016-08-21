@@ -10,14 +10,10 @@ int main() {
     Type a;
     Type b;
     std::cin >> a >> b;
-    std::cout << a + b << std::endl;
-    std::cout << a - b << std::endl;
-    std::cout << a * b << std::endl;
+    std::cout << a + b << ' ';
+    std::cout << a - b << ' ';
+    std::cout << a * b << ' ';
     std::cout << a / b << std::endl;
   }
-  Type c = Type(0) - Type(1);
-  Type d(1, 1);
-  std::cout << c << std::endl;
-  std::cout << d << std::endl;
   return 0;
 }

@@ -1,113 +1,119 @@
 #pragma once
 #pragma GCC diagnostic ignored "-Wshift-count-overflow"
 
-#include <cinttypes>
 #include <cstddef>
 #include <stdexcept>
 #include <string>
 #include "uint.hpp"
-#include "utils.hpp"
+#include "util.hpp"
 
 namespace pkr {
 
 template <typename HeadT, typename TailT>
 class Uint {
 public:
-  Uint();
-  Uint(const HeadT&, const TailT&);
-  template <typename otherUint> Uint(const otherUint&);
-  Uint(const std::string&, const uint8_t = 10);
+  constexpr Uint() = default;
+  constexpr Uint(const Uint&) = default;
+  constexpr Uint(const HeadT&, const TailT&) noexcept;
+  Uint(const std::string&, const uint8_t = 10) noexcept;
+  template <typename OtherUint> constexpr Uint(const OtherUint&) noexcept;
 
-  const Uint operator~() const;
-  const Uint operator++(int);
-  const Uint operator--(int);
-  const Uint& operator++();
-  const Uint& operator--();
-  const Uint& operator=(const Uint&);
-  const Uint& operator+=(const Uint&);
-  const Uint& operator-=(const Uint&);
-  const Uint& operator*=(const Uint&);
-  const Uint& operator/=(const Uint&);
-  const Uint& operator%=(const Uint&);
-  const Uint& operator&=(const Uint&);
-  const Uint& operator^=(const Uint&);
-  const Uint& operator|=(const Uint&);
-  const Uint& operator<<=(ssize_t);
-  const Uint& operator>>=(ssize_t);
+  constexpr Uint operator++(int) noexcept;
+  constexpr Uint operator--(int) noexcept;
+  constexpr Uint& operator++() noexcept;
+  constexpr Uint& operator--() noexcept;
+  constexpr Uint& operator= (const Uint&) noexcept;
+  constexpr Uint& operator+=(const Uint&) noexcept;
+  constexpr Uint& operator-=(const Uint&) noexcept;
+  constexpr Uint& operator*=(const Uint&) noexcept;
+  constexpr Uint& operator/=(const Uint&);
+  constexpr Uint& operator%=(const Uint&) noexcept;
+  constexpr Uint& operator&=(const Uint&) noexcept;
+  constexpr Uint& operator^=(const Uint&) noexcept;
+  constexpr Uint& operator|=(const Uint&) noexcept;
+  constexpr Uint& operator<<=(uint32_t) noexcept;
+  constexpr Uint& operator>>=(uint32_t) noexcept;
 
-  operator bool() const {
+  inline explicit constexpr operator bool() const noexcept {
     return (_head || _tail);
   }
 
-  operator uint8_t() const {
+  inline explicit constexpr operator uint8_t() const noexcept {
     return static_cast<uint8_t>(_tail);
   }
 
-  operator uint16_t() const {
-    return ((static_cast<uint16_t>(_head) << bits_size_of<TailT>())
-      + static_cast<uint16_t>(_tail));
+  inline explicit constexpr operator uint16_t() const noexcept {
+    if (tail_sz < 16) {
+      return ((static_cast<uint16_t>(_head) << tail_sz)
+        + static_cast<uint16_t>(_tail));
+    } else {
+      return static_cast<uint16_t>(_tail);
+    }
   }
 
-  operator uint32_t() const {
-    return ((static_cast<uint32_t>(_head) << bits_size_of<TailT>())
-      + static_cast<uint32_t>(_tail));
+  inline explicit constexpr operator uint32_t() const noexcept {
+    if (tail_sz < 32) {
+      return ((static_cast<uint32_t>(_head) << tail_sz)
+        + static_cast<uint32_t>(_tail));
+    } else {
+      return static_cast<uint32_t>(_tail);
+    }
   }
 
-  operator uint64_t() const {
-    return ((static_cast<uint64_t>(_head) << bits_size_of<TailT>())
-      + static_cast<uint64_t>(_tail));
+  inline explicit constexpr operator uint64_t() const noexcept {
+    if (tail_sz < 64) {
+      return ((static_cast<uint64_t>(_head) << tail_sz)
+        + static_cast<uint64_t>(_tail));
+    } else {
+      return static_cast<uint64_t>(_tail);
+    }
   }
 
-  const HeadT& head() const {
+  inline constexpr HeadT head() const noexcept {
     return _head;
   }
 
-  const TailT& tail() const {
+  inline constexpr TailT tail() const noexcept {
     return _tail;
   }
 
 private:
-  HeadT _head;
-  TailT _tail;
+  HeadT _head{0};
+  TailT _tail{0};
+
+  static constexpr auto tail_sz{util::bits_size_of<TailT>()};
+  static constexpr auto head_sz{util::bits_size_of<HeadT>()};
 };
 
-template <typename HeadT, typename TailT>
-Uint<HeadT, TailT>::Uint()
-  : _head(0)
-  , _tail(0) {}
-
-template <typename HeadT, typename TailT>
-Uint<HeadT, TailT>::Uint(const HeadT& h, const TailT& t)
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>::Uint(const HeadT& h, const TailT& t) noexcept
   : _head(h)
   , _tail(t) {}
 
 template <typename HeadT, typename TailT>
-template <typename otherUint>
-Uint<HeadT, TailT>::Uint(const otherUint& num)
-  : _head(bits_size_of<TailT>() < bits_size_of<otherUint>() ?
-      num >> bits_size_of<TailT>() : 0)
+template <typename OtherUint> constexpr
+Uint<HeadT, TailT>::Uint(const OtherUint& num) noexcept
+  : _head(tail_sz < util::bits_size_of<OtherUint>() ? num >> tail_sz : 0)
   , _tail(num) {}
 
 template <typename HeadT, typename TailT>
-Uint<HeadT, TailT>::Uint(const std::string& str, const uint8_t base)
-  : _head(0)
-  , _tail(0) {
+Uint<HeadT, TailT>::Uint(const std::string& str, const uint8_t base) noexcept {
   Uint<HeadT, TailT> digit(1);
-  for (auto iter = str.rbegin(); iter != str.rend(); ++iter) {
+  for (auto iter = str.crbegin(); iter != str.crend(); ++iter) {
     *this += (digit * Uint<HeadT, TailT>(*iter - '0'));
     digit *= base;
   }
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator=(const Uint& num) noexcept {
   _head = num._head;
   _tail = num._tail;
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator++() {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator++() noexcept {
   const auto tmp = _tail;
   ++_tail;
   if (_tail < tmp) {
@@ -116,15 +122,16 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator++() {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator++(int) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT> Uint<HeadT, TailT>::operator++(int) noexcept {
   const Uint<HeadT, TailT> res(*this);
   ++(*this);
   return res;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() noexcept {
+  // TODO. optimize: if ~tail == 0 -> --head (same with ++)
   const auto tmp = _tail;
   --_tail;
   if (_tail > tmp) {
@@ -133,15 +140,15 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator--(int) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT> Uint<HeadT, TailT>::operator--(int) noexcept {
   const Uint<HeadT, TailT> res(*this);
   --(*this);
   return res;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator+=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator+=(const Uint& num) noexcept {
   const TailT tail_sum = _tail + num._tail;
   if (tail_sum < _tail) {
     ++_head;
@@ -151,23 +158,23 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator+=(const Uint& num) {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator-=(const Uint& num) {
-  if (*this >= num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator-=(const Uint& num) noexcept {
+  // if (*this >= num) {
     if (_tail < num._tail) {
       --_head;
     }
     _head -= num._head;
     _tail -= num._tail;
-  } else {
-    *this = ~(num - *this);
-    ++(*this);
-  }
+  // } else {
+  //   *this = ~(num - *this);
+  //   ++(*this);
+  // }
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator*=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator*=(const Uint& num) noexcept {
   Uint<HeadT, TailT> base(num);
   Uint<HeadT, TailT> tmp(*this);
   *this = 0;
@@ -181,8 +188,8 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator*=(const Uint& num) {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
   if (num == 0) {
     throw std::runtime_error::runtime_error("division by zero");
   }
@@ -208,45 +215,37 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator%=(const Uint& num) {
-  return (*this -= ((*this / num) * num));
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator%=(const Uint& num) noexcept {
+  return *this -= ((*this / num) * num);
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator&=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator&=(const Uint& num) noexcept {
   _head &= num._head;
   _tail &= num._tail;
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator|=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator|=(const Uint& num) noexcept {
   _head |= num._head;
   _tail |= num._tail;
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator^=(const Uint& num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator^=(const Uint& num) noexcept {
   _head ^= num._head;
   _tail ^= num._tail;
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT> Uint<HeadT, TailT>::operator~() const {
-  Uint<HeadT, TailT> res(*this);
-  res._head = ~(res._head);
-  res._tail = ~(res._tail);
-  return res;
-}
-
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator<<=(ssize_t num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator<<=(uint32_t num) noexcept {
   if (num <= 8) {
     _head <<= num;
-    _head ^= HeadT(_tail >> (bits_size_of<TailT>() - num));
+    _head ^= HeadT(_tail >> (tail_sz - num));
     _tail <<= num;
   } else {
     *this <<= 8;
@@ -255,11 +254,11 @@ const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator<<=(ssize_t num) {
   return *this;
 }
 
-template <typename HeadT, typename TailT>
-const Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator>>=(ssize_t num) {
+template <typename HeadT, typename TailT> constexpr
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator>>=(uint32_t num) noexcept {
   if (num <= 8) {
     _tail >>= num;
-    _tail ^= (TailT(_head) << (bits_size_of<TailT>() - num));
+    _tail ^= (TailT(_head) << (tail_sz - num));
     _head >>= num;
   } else {
     *this >>= 8;

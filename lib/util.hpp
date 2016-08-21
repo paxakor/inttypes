@@ -2,24 +2,40 @@
 
 #include <climits>
 #include <cstddef>
+#include <type_traits>
+#include "uint_base.hpp"
+
+namespace pkr {
+
+template <typename HeadT, typename TailT> class Uint;
+
+namespace util {
 
 template <typename Type>
-constexpr ssize_t bits_size_of() {
-  return sizeof(Type) * CHAR_BIT;
+constexpr auto UintSize = sizeof(Type) * CHAR_BIT;
+
+template <typename HeadT, typename TailT>
+constexpr auto UintSize<Uint<HeadT, TailT>> = UintSize<HeadT> + UintSize<TailT>;
+
+template <typename Type>
+inline constexpr auto bits_size_of() noexcept {
+  return UintSize<Type>;
 }
 
 template <typename Type>
-constexpr ssize_t bits_size_of(const Type& num) {
-  return bits_size_of<Type>();
+inline constexpr auto bits_size_of(Type&&) noexcept {
+  return bits_size_of<std::decay_t<Type>>();
 }
 
 template <typename Type>
-ssize_t bits_len(const Type& num) {
-  ssize_t len = 0;
-  auto tmp = num;
-  while (tmp) {
+constexpr auto bits_len(Type num) {
+  size_t len = 0;
+  while (num) {
     ++len;
-    tmp >>= 1;
+    num >>= 1;
   }
   return len;
 }
+
+} // namespace util
+} // namespace pkr
