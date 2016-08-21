@@ -160,16 +160,11 @@ Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator+=(const Uint& num) noexcept {
 
 template <typename HeadT, typename TailT> constexpr
 Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator-=(const Uint& num) noexcept {
-  // if (*this >= num) {
-    if (_tail < num._tail) {
-      --_head;
-    }
-    _head -= num._head;
-    _tail -= num._tail;
-  // } else {
-  //   *this = ~(num - *this);
-  //   ++(*this);
-  // }
+  if (_tail < num._tail) {
+    --_head;
+  }
+  _head -= num._head;
+  _tail -= num._tail;
   return *this;
 }
 
