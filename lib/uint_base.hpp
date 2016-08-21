@@ -114,9 +114,8 @@ Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator=(const Uint& num) noexcept {
 
 template <typename HeadT, typename TailT> constexpr
 Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator++() noexcept {
-  const auto tmp = _tail;
   ++_tail;
-  if (_tail < tmp) {
+  if (!_tail) {
     ++_head;
   }
   return *this;
@@ -131,10 +130,8 @@ Uint<HeadT, TailT> Uint<HeadT, TailT>::operator++(int) noexcept {
 
 template <typename HeadT, typename TailT> constexpr
 Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() noexcept {
-  // TODO. optimize: if ~tail == 0 -> --head (same with ++)
-  const auto tmp = _tail;
   --_tail;
-  if (_tail > tmp) {
+  if (!~_tail) {
     --_head;
   }
   return *this;
