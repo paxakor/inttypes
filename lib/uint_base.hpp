@@ -27,7 +27,7 @@ public:
   constexpr Uint& operator-=(const Uint&) noexcept;
   constexpr Uint& operator*=(const Uint&) noexcept;
   constexpr Uint& operator/=(const Uint&);
-  constexpr Uint& operator%=(const Uint&) noexcept;
+  constexpr Uint& operator%=(const Uint&);
   constexpr Uint& operator&=(const Uint&) noexcept;
   constexpr Uint& operator^=(const Uint&) noexcept;
   constexpr Uint& operator|=(const Uint&) noexcept;
@@ -208,7 +208,7 @@ Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
 }
 
 template <typename HeadT, typename TailT> constexpr
-Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator%=(const Uint& num) noexcept {
+Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator%=(const Uint& num) {
   return *this -= ((*this / num) * num);
 }
 
