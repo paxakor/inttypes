@@ -1,5 +1,4 @@
 #pragma once
-#pragma GCC diagnostic ignored "-Wshift-count-overflow"
 
 #include <cstddef>
 #include <stdexcept>
@@ -131,7 +130,7 @@ Uint<HeadT, TailT> Uint<HeadT, TailT>::operator++(int) noexcept {
 template <typename HeadT, typename TailT> constexpr
 Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator--() noexcept {
   --_tail;
-  if (!~_tail) {
+  if (!static_cast<TailT>(~_tail)) {
     --_head;
   }
   return *this;
@@ -183,7 +182,7 @@ Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator*=(const Uint& num) noexcept {
 template <typename HeadT, typename TailT> constexpr
 Uint<HeadT, TailT>& Uint<HeadT, TailT>::operator/=(const Uint& num) {
   if (num == 0) {
-    throw std::runtime_error::runtime_error("division by zero");
+    throw std::runtime_error("division by zero");
   }
   Uint<HeadT, TailT> base(num);
   Uint<HeadT, TailT> digit_bit(1);
